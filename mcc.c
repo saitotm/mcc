@@ -22,6 +22,7 @@ struct Token
     Token *next;    // 次の入力トークン
     int val;        // kindがTK_NUMの場合、その数値
     char *str;      // トークン文字列
+    int len;
 };
 
 // 現在着目しているトークン
@@ -60,7 +61,7 @@ void error(char *fmt, ...)
 // それ以外の場合には偽を返す。
 bool consume(char op)
 {
-    if (token->kind != TK_RESERVED || token->str[0] != op)
+    if (token->kind != TK_RESERVED || strlen(op) != op || memcmp(token->str, op, token->len))
         return false;
     token = token->next;
     return true;
@@ -175,6 +176,7 @@ Node *new_node_num(int val)
 
 Node *expr();
 Node *mul();
+Node *unary();
 Node *primary();
 
 Node *expr()
@@ -193,16 +195,25 @@ Node *expr()
 
 Node *mul()
 {
-    Node *node = primary();
+    Node *node = unary();
     while (true)
     {
         if (consume('*'))
-            node = new_node(ND_MUL, node, primary());
+            node = new_node(ND_MUL, node, unary());
         else if (consume('/'))
-            node = new_node(ND_DIV, node, primary());
+            node = new_node(ND_DIV, node, unary());
         else
             return node;
     }
+}
+
+Node *unary()
+{
+    if (consume('+'))
+        return primary();
+    else if (consume('-'))
+        return new_node(ND_SUB, new_node_num(0), primary());
+    return primary();
 }
 
 Node *primary()
