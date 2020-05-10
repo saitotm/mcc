@@ -1,6 +1,6 @@
 #include "mcc.h"
 
-void gen(Node *node)
+static void gen(Node *node)
 {
     if (node->kind == ND_NUM)
     {
@@ -52,4 +52,19 @@ void gen(Node *node)
     }
 
     printf("  push rax\n");
+}
+
+void codegen(Node *node)
+{
+    printf(".intel_syntax noprefix\n");
+    printf(".global main\n");
+    printf("main:\n");
+
+    // 抽象構文木を下る
+    gen(node);
+
+    // スタックトップに式全体の値が残っているため
+    //　それをraxにロードして関数からの返り値とする
+    printf("  pop rax\n");
+    printf("  ret\n");
 }
