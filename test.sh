@@ -25,5 +25,12 @@ assert 15 "5*(9-6)"
 assert 4 "(3+5) / 2"
 assert 10 "-10 + 20"
 assert 2 "-5 * 3 + 17"
+assert 0 "1 == 0"
+assert 1 "1 != 5"
+assert 1 "1 < 2"
+assert 1 "-1 <= 2"
+assert 1 "5 > 3"
+assert 0 "-3 >= 5"
+
 
 echo OK
