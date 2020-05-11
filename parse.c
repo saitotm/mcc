@@ -1,6 +1,7 @@
 #include "mcc.h"
 
 Node *code[100];
+LVar *locals;
 
 static Node *new_node(NodeKind kind, Node *lhs, Node *rhs)
 {
@@ -19,11 +20,37 @@ static Node *new_node_num(int val)
     return node;
 }
 
+// 変数を名前で検索する。見つからない場合はNULLを返す。
+static LVar *find_lvar(Token *tok)
+{
+    for (LVar *var = locals; var; var = var->next)
+    {
+        if (var->len == tok->len && !memcmp(tok->str, var->name, var->len))
+            return var;
+    }
+    return NULL;
+}
+
 static Node *new_node_ident(Token *tok)
 {
     Node *node = calloc(1, sizeof(Node));
     node->kind = ND_LVAR;
-    node->offset = (tok->str[0] - 'a' + 1) * 8;
+
+    LVar *lvar = find_lvar(tok);
+    if (lvar)
+    {
+        node->offset = lvar->offset;
+    }
+    else
+    {
+        lvar = calloc(1, sizeof(LVar));
+        lvar->next = locals;
+        lvar->name = tok->str;
+        lvar->len = tok->len;
+        lvar->offset = locals->offset + 8;
+        node->offset = lvar->offset;
+        locals = lvar;
+    }
     return node;
 }
 
@@ -40,6 +67,13 @@ static Node *primary();
 void program()
 {
     int i = 0;
+    // ローカル変数リストの番兵
+    locals = calloc(1, sizeof(LVar));
+    locals->name = "";
+    locals->next = NULL;
+    locals->offset = 0;
+    locals->len = 0;
+
     while (!at_eof())
     {
         code[i] = stmt();

@@ -51,7 +51,8 @@ void tokenize();
 extern Token *token;
 // 入力プログラム
 extern char *user_input;
-
+// ローカル変数リスト
+extern LVar *locals;
 //
 // parse.c
 //

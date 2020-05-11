@@ -34,6 +34,8 @@ assert 0 "-3 >= 5;"
 assert 3 "a = 3;"
 assert 5 "a = 3; b = 2; a + b;"
 assert 14 "a = 3; b = 5 * 6 - 8; a + b / 2;"
+assert 15 "fizz = 3; buzz = 5; fizzbuzz = fizz * buzz;"
+assert 15 "ab=2; a=3; (ab + a) * 3;"
 
 
 echo OK

@@ -3,6 +3,7 @@
 
 char *user_input;
 Token *token;
+LVar *locals;
 
 // エラー箇所を報告する
 void error_at(char *loc, char *fmt, ...)
@@ -135,6 +136,7 @@ void tokenize()
         if (len)
         {
             cur = new_token(TK_IDENT, cur, p, len);
+            p += len;
             continue;
         }
 
