@@ -67,7 +67,7 @@ static Node *primary();
 void program()
 {
     int i = 0;
-    // ローカル変数リストの番兵
+    // ローカル変数リストの空の先頭要素
     locals = calloc(1, sizeof(LVar));
     locals->name = "";
     locals->next = NULL;
@@ -84,7 +84,11 @@ void program()
 
 static Node *stmt()
 {
-    Node *node = expr();
+    Node *node;
+    if (consume_ret())
+        node = new_node(ND_RETURN, expr(), NULL);
+    else
+        node = expr();
     expect(";");
     return node;
 }

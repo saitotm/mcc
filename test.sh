@@ -16,6 +16,8 @@ assert() {
     fi
 }
 
+#assert 15 "ab=2; a=3; (ab + a) * 3;"
+#assert 15 "a = 3; b = 2; (a + b) * 3;"
 assert 0 "0;"
 assert 42 "42;"
 assert 21 "5+20-4;"
@@ -36,6 +38,9 @@ assert 5 "a = 3; b = 2; a + b;"
 assert 14 "a = 3; b = 5 * 6 - 8; a + b / 2;"
 assert 15 "fizz = 3; buzz = 5; fizzbuzz = fizz * buzz;"
 assert 15 "ab=2; a=3; (ab + a) * 3;"
+assert 0 "return 0;"
+assert 5 "return 5; return 8;"
+assert 14 "a = 3; b = 5 * 6 - 8; return a + b / 2;"
 
 
 echo OK
