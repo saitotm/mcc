@@ -10,10 +10,10 @@ int main(int argc, char **argv)
 
     // トークナイズする
     user_input = argv[1];
-    token = tokenize(user_input);
-    Node *node = expr();
+    tokenize();
+    program();
 
-    codegen(node);
+    codegen();
 
     return 0;
 }

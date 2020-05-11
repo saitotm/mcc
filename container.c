@@ -40,12 +40,23 @@ bool consume(char *op)
     return true;
 }
 
+// 次のトークンが識別子の時には、トークンを返し、トークンを１つ進める
+// それ以外の場合にはNULLを返す。
+Token *consume_ident()
+{
+    if (token->kind != TK_IDENT)
+        return NULL;
+    Token *t = token;
+    token = token->next;
+    return t;
+}
+
 // 次のトークンが期待している記号のときには、トークンを1つ読み進める。
 // それ以外の場合にはエラーを報告する。
 void expect(char *op)
 {
     if (token->kind != TK_RESERVED || strlen(op) != token->len || memcmp(token->str, op, token->len))
-        error_at(token->str, "'%c'ではありません", op);
+        error_at(token->str, "'%s'ではありません", op);
     token = token->next;
 }
 
@@ -82,12 +93,13 @@ static bool startswith(char *p, char *q)
     return memcmp(p, q, strlen(q)) == 0;
 }
 
-// 入力文字列pをトークナイズしてそれを返す
-Token *tokenize(char *p)
+// 入力文字列pをトークナイズしてtokenに格納する
+void tokenize()
 {
     Token head;
     head.next = NULL;
     Token *cur = &head;
+    char *p = user_input;
     while (*p)
     {
         // 空文字をスキップ
@@ -104,7 +116,7 @@ Token *tokenize(char *p)
             continue;
         }
 
-        if (strchr("+-*/<>()", *p))
+        if (strchr("=+-*/<>();", *p))
         {
             cur = new_token(TK_RESERVED, cur, p++, 1);
             continue;
@@ -119,9 +131,16 @@ Token *tokenize(char *p)
             continue;
         }
 
+        int len = strcspn(p, "=+-*/<>();! ");
+        if (len)
+        {
+            cur = new_token(TK_IDENT, cur, p, len);
+            continue;
+        }
+
         error_at(p, "トークナイズできません");
     }
 
     new_token(TK_EOF, cur, p, 0);
-    return head.next;
+    token = head.next;
 }

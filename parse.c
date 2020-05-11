@@ -1,5 +1,7 @@
 #include "mcc.h"
 
+Node *code[100];
+
 static Node *new_node(NodeKind kind, Node *lhs, Node *rhs)
 {
     Node *node = calloc(1, sizeof(Node));
@@ -17,6 +19,17 @@ static Node *new_node_num(int val)
     return node;
 }
 
+static Node *new_node_ident(Token *tok)
+{
+    Node *node = calloc(1, sizeof(Node));
+    node->kind = ND_LVAR;
+    node->offset = (tok->str[0] - 'a' + 1) * 8;
+    return node;
+}
+
+static Node *stmt();
+static Node *expr();
+static Node *assign();
 static Node *equality();
 static Node *relational();
 static Node *add();
@@ -24,9 +37,35 @@ static Node *mul();
 static Node *unary();
 static Node *primary();
 
-Node *expr()
+void program()
 {
-    return equality();
+    int i = 0;
+    while (!at_eof())
+    {
+        code[i] = stmt();
+        i++;
+    }
+    code[i] = NULL;
+}
+
+static Node *stmt()
+{
+    Node *node = expr();
+    expect(";");
+    return node;
+}
+
+static Node *expr()
+{
+    return assign();
+}
+
+static Node *assign()
+{
+    Node *node = equality();
+    if (consume("="))
+        node = new_node(ND_ASSIGN, node, assign());
+    return node;
 }
 
 static Node *equality()
@@ -105,6 +144,11 @@ static Node *primary()
         Node *node = expr();
         expect(")");
         return node;
+    }
+    Token *tok = consume_ident();
+    if (tok)
+    {
+        return new_node_ident(tok);
     }
     return new_node_num(expect_number());
 }
